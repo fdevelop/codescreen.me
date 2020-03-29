@@ -1,0 +1,29 @@
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #E01A76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.masthead {
+  height: 100vh;
+  min-height: 500px;
+  background-image: url('/IMG_7087.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.CodeMirror {
+  border-radius: 5px;
+  border: 1px solid #efefef;
+}
+
