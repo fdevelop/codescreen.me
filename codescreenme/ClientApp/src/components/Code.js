@@ -22,6 +22,7 @@ export class Code extends React.Component {
     const idFromUrl = props.location.pathname.slice(idFromUrlIndex);
     this.state = { id: idFromUrl, loading: true };
     this.editorInstance = null;
+
     this.populateData = this.populateData.bind(this);
     this.editorTick = this.editorTick.bind(this);
     this.editorModeChange = this.editorModeChange.bind(this);
@@ -67,22 +68,81 @@ export class Code extends React.Component {
         <CodeMirror
           value={this.state.stateObject.codeSession.code}
           options={{
+            autofocus: true,
             lineNumbers: true,
             mode: this.state.editorMode,
             readOnly: this.state.stateObject.role === 1
           }}
-          editorDidMount={editor => { this.editorInstance = editor }}
-          onChange={(editor, data, value) => {
-            const response = fetch('api/code/' + this.state.id, {
+          selection={{
+            ranges: [{
+              anchor: {
+                line: this.state.stateObject.codeSession.codeCursorPosition.selectionFrom.line,
+                ch: this.state.stateObject.codeSession.codeCursorPosition.selectionFrom.ch
+              },
+              head: {
+                line: this.state.stateObject.codeSession.codeCursorPosition.selectionTo.line,
+                ch: this.state.stateObject.codeSession.codeCursorPosition.selectionTo.ch
+              }
+            }],
+            focus: true
+          }}
+          editorDidMount={(editor) => {
+            this.editorInstance = editor
+          }}
+          onSelection={(editor, data) => {
+            if (this.state.stateObject.role === 1) {
+              return;
+            }
+
+            const finalFrom = Array.isArray(data.ranges) ? data.ranges[0].anchor : editor.getCursor('from');
+            const finalTo = Array.isArray(data.ranges) ? data.ranges[0].head : editor.getCursor('to');
+
+            let newStateObject = this.state.stateObject;
+            newStateObject.codeSession.codeCursorPosition.selectionFrom = finalFrom;
+            newStateObject.codeSession.codeCursorPosition.selectionTo = finalTo;
+
+            const response = fetch('api/code/' + this.state.id + '/cursor', {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify({ 'text': value })
+              body: JSON.stringify({
+                'selectionFrom': finalFrom,
+                'selectionTo': finalTo
+              })
             });
+
+            this.setState({ stateObject: newStateObject });
+          }}
+          
+          onChange={(editor, data, value) => {
+            const finalFrom = (data.from) ? data.from : editor.getCursor('from');
+            const finalTo = (data.to) ? data.to : editor.getCursor('to');
 
             let newStateObject = this.state.stateObject;
             newStateObject.codeSession.code = value;
+
+            newStateObject.codeSession.codeCursorPosition.selectionFrom = finalFrom;
+            newStateObject.codeSession.codeCursorPosition.selectionTo = finalTo;
+
+            const response = fetch('api/code/' + this.state.id + '/codetext', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(value)
+            });
+
+            const response2 = fetch('api/code/' + this.state.id + '/cursor', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                'selectionFrom': finalFrom,
+                'selectionTo': finalTo
+              })
+            });
 
             this.setState({ stateObject: newStateObject });
           }}

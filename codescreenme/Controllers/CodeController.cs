@@ -31,11 +31,18 @@ namespace codescreenme.Controllers
       return new JsonResult(session);
     }
 
-    [HttpPut("{id}")]
-    public ActionResult PutCode(string id, [FromBody]CodeSessionState code)
+    [HttpPut("{id}/cursor")]
+    public ActionResult PutCodeCursor(string id, [FromBody]CodeCursor codeCursor)
     {
       string user = this.userRepository.GetCurrentUserId();
-      return this.codeSessionsRepository.UpdateSession(user, id, code.Text) ? Ok() : StatusCode(500);
+      return this.codeSessionsRepository.UpdateSession(user, id, codeCursor) ? Ok() : StatusCode(500);
+    }
+
+    [HttpPut("{id}/codetext")]
+    public ActionResult PutCodeText(string id, [FromBody]string codeText)
+    {
+      string user = this.userRepository.GetCurrentUserId();
+      return this.codeSessionsRepository.UpdateSession(user, id, codeText) ? Ok() : StatusCode(500);
     }
   }
 }
