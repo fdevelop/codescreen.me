@@ -5,13 +5,13 @@ require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
 require('codemirror/theme/neat.css');
 
-require('codemirror/mode/htmlmixed/htmlmixed');
-require('codemirror/mode/javascript/javascript');
-require('codemirror/mode/clike/clike');
-require('codemirror/mode/python/python');
-require('codemirror/mode/powershell/powershell');
-require('codemirror/mode/shell/shell');
-require('codemirror/mode/sql/sql');
+require('codemirror/mode/htmlmixed/htmlmixed.js');
+require('codemirror/mode/javascript/javascript.js');
+require('codemirror/mode/clike/clike.js');
+require('codemirror/mode/python/python.js');
+require('codemirror/mode/powershell/powershell.js');
+require('codemirror/mode/shell/shell.js');
+require('codemirror/mode/sql/sql.js');
 
 export class Code extends React.Component {
   static displayName = Code.name;
@@ -20,12 +20,19 @@ export class Code extends React.Component {
     super(props);
     const idFromUrlIndex = props.location.pathname.lastIndexOf('/') + 1;
     const idFromUrl = props.location.pathname.slice(idFromUrlIndex);
-    this.state = { id: idFromUrl, loading: true };
+    this.state = {
+      id: idFromUrl,
+      stateObject: null,
+      editorMode: 'clike',
+      loading: true
+    };
     this.editorInstance = null;
 
     this.populateData = this.populateData.bind(this);
     this.editorTick = this.editorTick.bind(this);
     this.editorModeChange = this.editorModeChange.bind(this);
+
+    console.log('ctor');
   }
 
   componentDidMount() {
@@ -40,6 +47,7 @@ export class Code extends React.Component {
         </div>
         )
     }
+
 
     return (
       <div>
@@ -62,7 +70,12 @@ export class Code extends React.Component {
         </div>
         <div>
           <span>Participants:</span>
-          {this.state.stateObject.codeSession.participants ? this.state.stateObject.codeSession.participants.map((p) => p === this.state.stateObject.codeSession.owner ? <span key={p} className="badge badge-primary">{p}</span> : <span key={p} className="badge badge-secondary">{p}</span>) : <span>Unavailable</span>}
+          {this.state.stateObject.codeSession.participants
+            ? this.state.stateObject.codeSession.participants.map((p) =>
+              p === this.state.stateObject.codeSession.owner
+                ? <span key={p} className="badge badge-primary">{p}</span>
+                : <span key={p} className="badge badge-secondary">{p}</span>)
+            : <span>Unavailable</span>}
         </div>
 
         <CodeMirror
