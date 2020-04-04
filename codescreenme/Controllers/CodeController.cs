@@ -31,6 +31,13 @@ namespace codescreenme.Controllers
       return new JsonResult(session);
     }
 
+    [HttpDelete("{id}/cursor")]
+    public ActionResult DeleteCodeCursor(string id)
+    {
+      string user = this.userRepository.GetCurrentUserId();
+      return this.codeSessionsRepository.UpdateSessionEraseHighlights(user, id) ? Ok() : StatusCode(500);
+    }
+
     [HttpPut("{id}/cursor")]
     public ActionResult PutCodeCursor(string id, [FromBody]CodeCursor codeCursor)
     {

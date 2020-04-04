@@ -9,6 +9,7 @@ namespace codescreenme.Processing
     CodeConnection GetSessionById(string user, string id);
     bool UpdateSession(string user, string id, string code);
     bool UpdateSession(string user, string id, CodeCursor codeCursor);
+    bool UpdateSessionEraseHighlights(string user, string id);
     bool RemoveSession(string user, string id);
     IEnumerable<CodeSession> GetUserOwnedSessions(string user);
   }
