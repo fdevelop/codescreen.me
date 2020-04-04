@@ -8,5 +8,6 @@ namespace codescreenme.Data
   public class CodeSessionState
   {
     public string Text { get; set; }
+    public CodeCursor Cursor { get; set; }
   }
 }

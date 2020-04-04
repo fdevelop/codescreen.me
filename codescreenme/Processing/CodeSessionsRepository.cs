@@ -41,6 +41,28 @@ namespace codescreenme.Processing
       return codeConnection;
     }
 
+    public bool UpdateSession(string user, string id, CodeCursor codeCursor)
+    {
+      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      if (element == null)
+        return false;
+
+      element.CodeHighlights.Add(codeCursor);
+
+      return true;
+    }
+
+    public bool UpdateSessionEraseHighlights(string user, string id)
+    {
+      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      if (element == null)
+        return false;
+
+      element.CodeHighlights.Clear();
+
+      return true;
+    }
+
     public bool UpdateSession(string user, string id, string code)
     {
       var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
