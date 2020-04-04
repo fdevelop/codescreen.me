@@ -13,13 +13,13 @@ namespace codescreenme.Data
       public int Ch { get; set; }
     }
 
-    public CursorPoint SelectionFrom { get; set; }
-    public CursorPoint SelectionTo { get; set; }
+    public CursorPoint HighlightFrom { get; set; }
+    public CursorPoint HighlightTo { get; set; }
 
     public CodeCursor()
     {
-      this.SelectionFrom = new CursorPoint();
-      this.SelectionTo = new CursorPoint();
+      this.HighlightFrom = new CursorPoint();
+      this.HighlightTo = new CursorPoint();
     }
   }
 }

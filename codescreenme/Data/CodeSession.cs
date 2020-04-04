@@ -12,7 +12,7 @@ namespace codescreenme.Data
     public string Id { get; set; }
     public DateTime DateCreated { get; set; }
     public string Code { get; set; }
-    public CodeCursor CodeCursorPosition { get; set; }
+    public IList<CodeCursor> CodeHighlights { get; set; }
     public string Owner { get; set; }
     public IList<string> Participants { get; set; }
 
@@ -21,7 +21,7 @@ namespace codescreenme.Data
       this.Id = this.GenerateId();
       this.DateCreated = DateTime.UtcNow;
       this.Participants = new List<string>();
-      this.CodeCursorPosition = new CodeCursor();
+      this.CodeHighlights = new List<CodeCursor>();
     }
 
     private const int IdLength = 6;

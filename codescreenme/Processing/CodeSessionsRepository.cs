@@ -47,7 +47,18 @@ namespace codescreenme.Processing
       if (element == null)
         return false;
 
-      element.CodeCursorPosition = codeCursor;
+      element.CodeHighlights.Add(codeCursor);
+
+      return true;
+    }
+
+    public bool UpdateSessionEraseHighlights(string user, string id)
+    {
+      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      if (element == null)
+        return false;
+
+      element.CodeHighlights.Clear();
 
       return true;
     }
