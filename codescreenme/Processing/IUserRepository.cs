@@ -1,7 +1,11 @@
-﻿namespace codescreenme.Processing
+﻿using codescreenme.Data;
+
+namespace codescreenme.Processing
 {
   public interface IUserRepository
   {
-    string GetCurrentUserId();
+    User GetCurrentUser();
+    User GetUserById(string id);
+    bool UpdateUser(string id, User user);
   }
 }

@@ -25,8 +25,8 @@ namespace codescreenme.Controllers
     [HttpGet("{id}")]
     public ActionResult Get(string id)
     {
-      string user = this.userRepository.GetCurrentUserId();
-      var session = this.codeSessionsRepository.GetSessionById(user, id);
+      User user = this.userRepository.GetCurrentUser();
+      var session = this.codeSessionsRepository.GetSessionById(user.Id, id);
 
       return new JsonResult(session);
     }
@@ -34,22 +34,22 @@ namespace codescreenme.Controllers
     [HttpDelete("{id}/cursor")]
     public ActionResult DeleteCodeCursor(string id)
     {
-      string user = this.userRepository.GetCurrentUserId();
-      return this.codeSessionsRepository.UpdateSessionEraseHighlights(user, id) ? Ok() : StatusCode(500);
+      User user = this.userRepository.GetCurrentUser();
+      return this.codeSessionsRepository.UpdateSessionEraseHighlights(user.Id, id) ? Ok() : StatusCode(500);
     }
 
     [HttpPut("{id}/cursor")]
     public ActionResult PutCodeCursor(string id, [FromBody]CodeCursor codeCursor)
     {
-      string user = this.userRepository.GetCurrentUserId();
-      return this.codeSessionsRepository.UpdateSession(user, id, codeCursor) ? Ok() : StatusCode(500);
+      User user = this.userRepository.GetCurrentUser();
+      return this.codeSessionsRepository.UpdateSession(user.Id, id, codeCursor) ? Ok() : StatusCode(500);
     }
 
     [HttpPut("{id}/codetext")]
     public ActionResult PutCodeText(string id, [FromBody]string codeText)
     {
-      string user = this.userRepository.GetCurrentUserId();
-      return this.codeSessionsRepository.UpdateSession(user, id, codeText) ? Ok() : StatusCode(500);
+      User user = this.userRepository.GetCurrentUser();
+      return this.codeSessionsRepository.UpdateSession(user.Id, id, codeText) ? Ok() : StatusCode(500);
     }
   }
 }

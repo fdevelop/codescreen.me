@@ -25,8 +25,13 @@ namespace codescreenme.Controllers
     [HttpGet]
     public IEnumerable<CodeSession> Get()
     {
-      string user = this.userRepository.GetCurrentUserId();
-      var sessions = this.codeSessionsRepository.GetUserOwnedSessions(user);
+      User user = this.userRepository.GetCurrentUser();
+      if (user == null)
+      {
+        return new CodeSession[0];
+      }
+
+      var sessions = this.codeSessionsRepository.GetUserOwnedSessions(user.Id);
 
       return sessions;
     }
@@ -40,8 +45,8 @@ namespace codescreenme.Controllers
     [HttpPost()]
     public ActionResult<CodeSession> Post(CodeSession codeSession)
     {
-      string user = this.userRepository.GetCurrentUserId();
-      if (string.IsNullOrEmpty(user))
+      User user = this.userRepository.GetCurrentUser();
+      if (user == null)
       {
         return new StatusCodeResult(500);
       }
@@ -50,8 +55,8 @@ namespace codescreenme.Controllers
       {
         Code = codeSession == null ? string.Empty : codeSession.Code,
         DateCreated = codeSession == null ? DateTime.UtcNow : codeSession.DateCreated,
-        Owner = user,
-        Participants = new List<string>(new string[] { user })
+        Owner = user.Id,
+        Participants = new List<string>(new string[] { user.Id })
       };
 
       this.codeSessionsRepository.CreateNewSession(newCodeSession);
@@ -62,9 +67,9 @@ namespace codescreenme.Controllers
     [HttpDelete("{id}")]
     public ActionResult<bool> Delete(string id)
     {
-      string user = this.userRepository.GetCurrentUserId();
+      User user = this.userRepository.GetCurrentUser();
 
-      var result = this.codeSessionsRepository.RemoveSession(user, id);
+      var result = this.codeSessionsRepository.RemoveSession(user.Id, id);
       return new ActionResult<bool>(result);
     }
   }

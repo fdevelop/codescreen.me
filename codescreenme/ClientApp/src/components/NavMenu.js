@@ -10,15 +10,56 @@ export class NavMenu extends Component {
     super(props);
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
+    this.getUserName = this.getUserName.bind(this);
+    this.changeUserName = this.changeUserName.bind(this);
+    this.getUserDisplayNameFromCookie = this.getUserDisplayNameFromCookie.bind(this);
+
     this.state = {
-      collapsed: true
+      collapsed: true,
+      userDisplayName: this.getUserDisplayNameFromCookie()
     };
+  }
+
+  getUserDisplayNameFromCookie() {
+    let cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)UniqueUserDisplayName\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    if (!cookieValue) {
+      cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)UniqueUser\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    }
+
+    return cookieValue;
   }
 
   toggleNavbar() {
     this.setState({
       collapsed: !this.state.collapsed
     });
+  }
+
+  changeUserName() {
+    let cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)UniqueUser\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    let prom = window.prompt('Enter new display name for your user:', this.getUserName());
+
+    if (prom != null) {
+      let finalObject = { id: cookieValue, displayName: prom };
+
+      const response = fetch('api/users/' + cookieValue, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(finalObject)
+      });
+
+      this.setState({
+        userDisplayName: prom
+      });
+
+      return true;
+    }
+  }
+
+  getUserName() {
+    return this.state.userDisplayName;
   }
 
   render() {
@@ -35,6 +76,15 @@ export class NavMenu extends Component {
                 </NavItem>
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/about">About</NavLink>
+                </NavItem>
+                <NavItem>
+                  <div className="dropdown show">
+                    <a className="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{this.getUserName()}</a>
+
+                    <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                      <a className="dropdown-item" href="#" onClick={(e) => this.changeUserName()}>Change user name</a>
+                    </div>
+                  </div>
                 </NavItem>
               </ul>
             </Collapse>
