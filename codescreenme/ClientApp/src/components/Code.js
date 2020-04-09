@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2'
+import * as signalR from "@microsoft/signalr";
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
@@ -22,23 +23,55 @@ export class Code extends React.Component {
     const idFromUrl = props.location.pathname.slice(idFromUrlIndex);
     this.state = {
       id: idFromUrl,
-      stateObject: null,
+      codeConnection: null,
       editorMode: 'text/x-csharp',
-      loading: true
+      loading: true,
+      hubConnection: null
     };
     this.editorInstance = null;
 
     this.populateData = this.populateData.bind(this);
-    this.editorTick = this.editorTick.bind(this);
     this.editorModeChange = this.editorModeChange.bind(this);
     this.highlightTextAction = this.highlightTextAction.bind(this);
     this.highlightEraseAction = this.highlightEraseAction.bind(this);
     this.highlightEraseClick = this.highlightEraseClick.bind(this);
     this.highlightSelectionClick = this.highlightSelectionClick.bind(this);
+    
+    this.setupSignalR = this.setupSignalR.bind(this);
+    this.receiveCodeUpdateListener = this.receiveCodeUpdateListener.bind(this);
+    this.sendCodeUpdate = this.sendCodeUpdate.bind(this);
   }
 
   componentDidMount() {
     this.populateData();
+    this.setupSignalR();
+  }
+
+  setupSignalR() {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl("/codehub")
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    this.setState({ hubConnection: connection }, () => {
+      this.state.hubConnection
+        .start()
+        .catch(err => console.error('Error while establishing connection with codehub, application may not work as expected. ' + err));
+
+      this.state.hubConnection
+        .on("ReceiveCodeUpdate", this.receiveCodeUpdateListener);
+    });
+  }
+
+  receiveCodeUpdateListener(user, sessionId, code) {
+    if (this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+      return;
+    }
+
+    let newCodeConnection = this.state.codeConnection;
+    newCodeConnection.codeSession.code = code;
+
+    this.setState({ codeConnection: newCodeConnection });
   }
 
   highlightTextAction(editor, from, to) {
@@ -57,7 +90,7 @@ export class Code extends React.Component {
   }
 
   highlightSelectionClick(eventData, editor) {
-    if (!editor.somethingSelected() || this.state.stateObject.role === 1) {
+    if (!editor.somethingSelected() || this.state.codeConnection.role === 1) {
       return;
     }
 
@@ -70,8 +103,8 @@ export class Code extends React.Component {
 
     // Server side
 
-    let newStateObject = this.state.stateObject;
-    newStateObject.codeSession.codeHighlights.push(finalObject);
+    let newCodeConnection = this.state.codeConnection;
+    newCodeConnection.codeSession.codeHighlights.push(finalObject);
 
     const response = fetch('api/code/' + this.state.id + '/cursor', {
       method: 'PUT',
@@ -81,7 +114,7 @@ export class Code extends React.Component {
       body: JSON.stringify(finalObject)
     });
 
-    this.setState({ stateObject: newStateObject });
+    this.setState({ codeConnection: newCodeConnection });
   }
 
   highlightEraseAction(editor) {
@@ -92,7 +125,7 @@ export class Code extends React.Component {
   }
 
   highlightEraseClick(eventData, editor) {
-    if (this.state.stateObject.role === 1) {
+    if (this.state.codeConnection.role === 1) {
       return;
     }
 
@@ -102,18 +135,30 @@ export class Code extends React.Component {
 
     // Server side
 
-    let newStateObject = this.state.stateObject;
-    newStateObject.codeSession.codeHighlights.length = 0;
+    let newCodeConnection = this.state.codeConnection;
+    newCodeConnection.codeSession.codeHighlights.length = 0;
 
     const response = fetch('api/code/' + this.state.id + '/cursor', {
       method: 'DELETE'
     });
 
-    this.setState({ stateObject: newStateObject });
+    this.setState({ codeConnection: newCodeConnection });
+  }
+
+  sendCodeUpdate(newCodeValue) {
+    var user = this.state.codeConnection.user;
+    var session = this.state.id;
+
+    this.state.hubConnection.invoke("ReceiveCodeUpdate", user, session, newCodeValue)
+      .then(function (r) { return true; })
+      .catch(function (err) {
+        console.error(err.toString());
+        return false;
+      });
   }
 
   render() {
-    if (!this.state.stateObject) {
+    if (!this.state.codeConnection) {
       return (
         <div>
           Nothing to render...
@@ -141,9 +186,9 @@ export class Code extends React.Component {
 
         <div>
           <span>Participants:</span>
-          {this.state.stateObject.codeSession.participants
-            ? this.state.stateObject.codeSession.participants.map((p) =>
-              p === this.state.stateObject.codeSession.owner
+          {this.state.codeConnection.codeSession.participants
+            ? this.state.codeConnection.codeSession.participants.map((p) =>
+              p === this.state.codeConnection.codeSession.owner
                 ? <span key={p} className="badge badge-secondary">{p} (Owner)</span>
                 : <span key={p} className="badge badge-secondary">{p}</span>)
             : <span>Unavailable</span>}
@@ -156,29 +201,23 @@ export class Code extends React.Component {
         </div>
 
         <CodeMirror
-          value={this.state.stateObject.codeSession.code}
+          value={this.state.codeConnection.codeSession.code}
           options={{
             autofocus: true,
             lineNumbers: true,
             mode: this.state.editorMode,
-            readOnly: this.state.stateObject.role === 1
+            readOnly: this.state.codeConnection.role === 1
           }}
           editorDidMount={(editor) => {
             this.editorInstance = editor
           }}
           onBeforeChange={(editor, data, value) => {
-            let newStateObject = this.state.stateObject;
-            newStateObject.codeSession.code = value;
+            let newCodeConnection = this.state.codeConnection;
+            newCodeConnection.codeSession.code = value;
 
-            const response = fetch('api/code/' + this.state.id + '/codetext', {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(value)
-            });
+            this.sendCodeUpdate(value);
 
-            this.setState({ stateObject: newStateObject });
+            this.setState({ codeConnection: newCodeConnection });
           }}
           onChange={(editor, data, value) => {
           }}
@@ -191,27 +230,17 @@ export class Code extends React.Component {
     this.setState({ editorMode: event.target.value });
   }
 
-  editorTick() {
-    this.populateData();
-
-    this.editorInstance.focus();
-  }
-
   async populateData() {
     const response = await fetch('api/code/' + this.state.id);
     const data = await response.json();
 
     if (data) {
-      this.setState({ id: data.codeSession.id, stateObject: data, loading: false });
+      this.setState({ id: data.codeSession.id, codeConnection: data, loading: false });
 
       this.highlightEraseAction(this.editorInstance);
-      for (const cc of this.state.stateObject.codeSession.codeHighlights) {
+      for (const cc of this.state.codeConnection.codeSession.codeHighlights) {
         this.highlightTextAction(this.editorInstance, cc.highlightFrom, cc.highlightTo);
       }
-    }
-
-    if (this.state.stateObject.role === 1) {
-      setTimeout(this.editorTick, 1000);
     }
   }
 }
