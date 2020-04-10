@@ -1,3 +1,4 @@
+using codescreenme.Hubs;
 using codescreenme.Processing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,7 +23,7 @@ namespace codescreenme
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-
+      services.AddSignalR();
       services.AddControllersWithViews();
 
       services.AddHttpContextAccessor();
@@ -75,6 +76,8 @@ namespace codescreenme
         endpoints.MapControllerRoute(
                   name: "default",
                   pattern: "{controller}/{action=Index}/{id?}");
+
+        endpoints.MapHub<CodeHub>("/codehub");
       });
 
       app.UseSpa(spa =>
