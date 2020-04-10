@@ -19,8 +19,10 @@ export class Code extends React.Component {
 
   constructor(props) {
     super(props);
+
     const idFromUrlIndex = props.location.pathname.lastIndexOf('/') + 1;
     const idFromUrl = props.location.pathname.slice(idFromUrlIndex);
+
     this.state = {
       id: idFromUrl,
       codeConnection: null,
@@ -38,19 +40,27 @@ export class Code extends React.Component {
     this.highlightEraseClick = this.highlightEraseClick.bind(this);
     this.highlightSelectionClick = this.highlightSelectionClick.bind(this);
     
-    this.setupSignalR = this.setupSignalR.bind(this);
     this.receiveCodeUpdateListener = this.receiveCodeUpdateListener.bind(this);
     this.setCodeHighlightListener = this.setCodeHighlightListener.bind(this);
     this.removeCodeHighlightsListener = this.removeCodeHighlightsListener.bind(this);
     this.sendCodeUpdate = this.sendCodeUpdate.bind(this);
+    this.participantListener = this.participantListener.bind(this);
+    this.participantJoined = this.participantJoined.bind(this);
+
+    this.setupSignalR = this.setupSignalR.bind(this);
   }
 
   componentDidMount() {
     this.populateData();
+
     this.setupSignalR();
   }
 
   setupSignalR() {
+    if (this.state.hubConnection !== null) {
+      return;
+    }
+
     const connection = new signalR.HubConnectionBuilder()
       .withUrl("/codehub")
       .configureLogging(signalR.LogLevel.Information)
@@ -59,6 +69,7 @@ export class Code extends React.Component {
     this.setState({ hubConnection: connection }, () => {
       this.state.hubConnection
         .start()
+        .then((v) => this.participantJoined())
         .catch(err => console.error('Error while establishing connection with codehub, application may not work as expected. ' + err));
 
       this.state.hubConnection
@@ -69,6 +80,9 @@ export class Code extends React.Component {
 
       this.state.hubConnection
         .on("SetCodeHighlight", this.setCodeHighlightListener);
+
+      this.state.hubConnection
+        .on("ParticipantJoined", this.participantListener);
     });
   }
 
@@ -97,6 +111,15 @@ export class Code extends React.Component {
     }
 
     this.highlightTextAction(this.editorInstance, codeCursor.highlightFrom, codeCursor.highlightTo);
+  }
+
+  participantListener(user, sessionId) {
+    if (this.state.codeConnection.codeSession.id == sessionId && !this.state.codeConnection.codeSession.participants.includes(user)) {
+      let newCodeConnection = this.state.codeConnection;
+      newCodeConnection.codeSession.participants.push(user);
+
+      this.setState({ codeConnection: newCodeConnection });
+    }
   }
 
   highlightTextAction(editor, from, to) {
@@ -174,6 +197,15 @@ export class Code extends React.Component {
 
   sendCodeUpdate(newCodeValue) {
     this.state.hubConnection.invoke("ReceiveCodeUpdate", this.state.codeConnection.user, this.state.id, newCodeValue)
+      .then(function (r) { return true; })
+      .catch(function (err) {
+        console.error(err.toString());
+        return false;
+      });
+  }
+
+  participantJoined() {
+    this.state.hubConnection.invoke("ParticipantJoined", this.state.codeConnection.user, this.state.id)
       .then(function (r) { return true; })
       .catch(function (err) {
         console.error(err.toString());

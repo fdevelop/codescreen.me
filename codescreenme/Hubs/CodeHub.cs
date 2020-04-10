@@ -39,5 +39,10 @@ namespace codescreenme.Hubs
 
       this.codeSessionsRepository.UpdateSession(user, sessionId, codeCursor);
     }
+
+    public async Task ParticipantJoined(string user, string sessionId)
+    {
+      await Clients.All.SendAsync("ParticipantJoined", user, sessionId);
+    }
   }
 }
