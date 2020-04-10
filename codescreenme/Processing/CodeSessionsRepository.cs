@@ -28,16 +28,13 @@ namespace codescreenme.Processing
     public CodeConnection GetSessionById(string user, string id)
     {
       var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
-      var codeConnection = new CodeConnection() { CodeSession = element, Role = element.Owner == user ? CodeSessionRole.Admin : CodeSessionRole.Guest, User = user };
+      var codeConnection = new CodeConnection() { CodeSession = element, User = user };
 
-      if (codeConnection.Role == CodeSessionRole.Guest)
+      if (!codeConnection.CodeSession.Participants.Contains(user))
       {
-        if (!codeConnection.CodeSession.Participants.Contains(user))
-        {
-          codeConnection.CodeSession.Participants.Add(user);
-        }
+        codeConnection.CodeSession.Participants.Add(user);
       }
-
+      
       return codeConnection;
     }
 
@@ -70,6 +67,17 @@ namespace codescreenme.Processing
         return false;
 
       element.Code = code;
+
+      return true;
+    }
+
+    public bool UpdateSessionUserInControl(string user, string id, string newUserInControl)
+    {
+      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      if (element == null)
+        return false;
+
+      element.UserInControl = newUserInControl;
 
       return true;
     }

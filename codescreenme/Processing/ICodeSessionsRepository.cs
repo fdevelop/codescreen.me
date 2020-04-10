@@ -10,6 +10,7 @@ namespace codescreenme.Processing
     bool UpdateSession(string user, string id, string code);
     bool UpdateSession(string user, string id, CodeCursor codeCursor);
     bool UpdateSessionEraseHighlights(string user, string id);
+    bool UpdateSessionUserInControl(string user, string id, string newUserInControl);
     bool RemoveSession(string user, string id);
     IEnumerable<CodeSession> GetUserOwnedSessions(string user);
   }
