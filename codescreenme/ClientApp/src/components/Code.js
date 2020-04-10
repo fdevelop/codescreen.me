@@ -32,6 +32,7 @@ export class Code extends React.Component {
 
     this.populateData = this.populateData.bind(this);
     this.editorModeChange = this.editorModeChange.bind(this);
+
     this.highlightTextAction = this.highlightTextAction.bind(this);
     this.highlightEraseAction = this.highlightEraseAction.bind(this);
     this.highlightEraseClick = this.highlightEraseClick.bind(this);
@@ -39,6 +40,8 @@ export class Code extends React.Component {
     
     this.setupSignalR = this.setupSignalR.bind(this);
     this.receiveCodeUpdateListener = this.receiveCodeUpdateListener.bind(this);
+    this.setCodeHighlightListener = this.setCodeHighlightListener.bind(this);
+    this.removeCodeHighlightsListener = this.removeCodeHighlightsListener.bind(this);
     this.sendCodeUpdate = this.sendCodeUpdate.bind(this);
   }
 
@@ -60,11 +63,17 @@ export class Code extends React.Component {
 
       this.state.hubConnection
         .on("ReceiveCodeUpdate", this.receiveCodeUpdateListener);
+
+      this.state.hubConnection
+        .on("RemoveCodeHighlights", this.removeCodeHighlightsListener);
+
+      this.state.hubConnection
+        .on("SetCodeHighlight", this.setCodeHighlightListener);
     });
   }
 
   receiveCodeUpdateListener(user, sessionId, code) {
-    if (this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
       return;
     }
 
@@ -72,6 +81,22 @@ export class Code extends React.Component {
     newCodeConnection.codeSession.code = code;
 
     this.setState({ codeConnection: newCodeConnection });
+  }
+
+  removeCodeHighlightsListener(user, sessionId) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+      return;
+    }
+
+    this.highlightEraseAction(this.editorInstance);
+  }
+
+  setCodeHighlightListener(user, sessionId, codeCursor) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+      return;
+    }
+
+    this.highlightTextAction(this.editorInstance, codeCursor.highlightFrom, codeCursor.highlightTo);
   }
 
   highlightTextAction(editor, from, to) {
@@ -106,13 +131,12 @@ export class Code extends React.Component {
     let newCodeConnection = this.state.codeConnection;
     newCodeConnection.codeSession.codeHighlights.push(finalObject);
 
-    const response = fetch('api/code/' + this.state.id + '/cursor', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(finalObject)
-    });
+    this.state.hubConnection.invoke("SetCodeHighlight", this.state.codeConnection.user, this.state.id, finalObject)
+      .then(function (r) { return true; })
+      .catch(function (err) {
+        console.error(err.toString());
+        return false;
+      });
 
     this.setState({ codeConnection: newCodeConnection });
   }
@@ -138,18 +162,18 @@ export class Code extends React.Component {
     let newCodeConnection = this.state.codeConnection;
     newCodeConnection.codeSession.codeHighlights.length = 0;
 
-    const response = fetch('api/code/' + this.state.id + '/cursor', {
-      method: 'DELETE'
-    });
+    this.state.hubConnection.invoke("RemoveCodeHighlights", this.state.codeConnection.user, this.state.id)
+      .then(function (r) { return true; })
+      .catch(function (err) {
+        console.error(err.toString());
+        return false;
+      });
 
     this.setState({ codeConnection: newCodeConnection });
   }
 
   sendCodeUpdate(newCodeValue) {
-    var user = this.state.codeConnection.user;
-    var session = this.state.id;
-
-    this.state.hubConnection.invoke("ReceiveCodeUpdate", user, session, newCodeValue)
+    this.state.hubConnection.invoke("ReceiveCodeUpdate", this.state.codeConnection.user, this.state.id, newCodeValue)
       .then(function (r) { return true; })
       .catch(function (err) {
         console.error(err.toString());
