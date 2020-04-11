@@ -14,6 +14,7 @@ namespace codescreenme.Data
     public string Code { get; set; }
     public IList<CodeCursor> CodeHighlights { get; set; }
     public string Owner { get; set; }
+    public string UserInControl { get; set; }
     public IList<string> Participants { get; set; }
 
     public CodeSession()

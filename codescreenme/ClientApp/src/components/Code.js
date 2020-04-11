@@ -28,8 +28,10 @@ export class Code extends React.Component {
       codeConnection: null,
       editorMode: 'text/x-csharp',
       loading: true,
+      userSwitcherFlag: false,
       hubConnection: null
     };
+
     this.editorInstance = null;
 
     this.populateData = this.populateData.bind(this);
@@ -39,13 +41,16 @@ export class Code extends React.Component {
     this.highlightEraseAction = this.highlightEraseAction.bind(this);
     this.highlightEraseClick = this.highlightEraseClick.bind(this);
     this.highlightSelectionClick = this.highlightSelectionClick.bind(this);
-    
+
     this.receiveCodeUpdateListener = this.receiveCodeUpdateListener.bind(this);
     this.setCodeHighlightListener = this.setCodeHighlightListener.bind(this);
     this.removeCodeHighlightsListener = this.removeCodeHighlightsListener.bind(this);
     this.sendCodeUpdate = this.sendCodeUpdate.bind(this);
     this.participantListener = this.participantListener.bind(this);
     this.participantJoined = this.participantJoined.bind(this);
+    this.setUserInControlListener = this.setUserInControlListener.bind(this);
+    this.switchUserInControlClick = this.switchUserInControlClick.bind(this);
+    this.selectUserInControlClick = this.selectUserInControlClick.bind(this);
 
     this.setupSignalR = this.setupSignalR.bind(this);
   }
@@ -83,11 +88,14 @@ export class Code extends React.Component {
 
       this.state.hubConnection
         .on("ParticipantJoined", this.participantListener);
+
+      this.state.hubConnection
+        .on("SetUserInControl", this.setUserInControlListener);
     });
   }
 
   receiveCodeUpdateListener(user, sessionId, code) {
-    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.rights.canEdit) {
       return;
     }
 
@@ -98,7 +106,7 @@ export class Code extends React.Component {
   }
 
   removeCodeHighlightsListener(user, sessionId) {
-    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.rights.canEdit) {
       return;
     }
 
@@ -106,7 +114,7 @@ export class Code extends React.Component {
   }
 
   setCodeHighlightListener(user, sessionId, codeCursor) {
-    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.role === 0) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.rights.canEdit) {
       return;
     }
 
@@ -114,11 +122,18 @@ export class Code extends React.Component {
   }
 
   participantListener(user, sessionId) {
-    if (this.state.codeConnection.codeSession.id == sessionId && !this.state.codeConnection.codeSession.participants.includes(user)) {
+    if (this.state.id === sessionId && !this.state.codeConnection.codeSession.participants.includes(user)) {
       let newCodeConnection = this.state.codeConnection;
       newCodeConnection.codeSession.participants.push(user);
 
       this.setState({ codeConnection: newCodeConnection });
+    }
+  }
+
+  setUserInControlListener(user, sessionId, newUser) {
+    if (this.state.id === sessionId) {
+      console.log('I hear u + ' + newUser);
+      this.populateData();
     }
   }
 
@@ -138,7 +153,7 @@ export class Code extends React.Component {
   }
 
   highlightSelectionClick(eventData, editor) {
-    if (!editor.somethingSelected() || this.state.codeConnection.role === 1) {
+    if (!editor.somethingSelected() || !this.state.codeConnection.rights.canEdit) {
       return;
     }
 
@@ -172,7 +187,7 @@ export class Code extends React.Component {
   }
 
   highlightEraseClick(eventData, editor) {
-    if (this.state.codeConnection.role === 1) {
+    if (!this.state.codeConnection.rights.canEdit) {
       return;
     }
 
@@ -213,19 +228,63 @@ export class Code extends React.Component {
       });
   }
 
+  switchUserInControlClick(eventData) {
+    if (!this.state.codeConnection.rights.canAdministrate) {
+      return;
+    }
+
+    this.setState({
+      userSwitcherFlag: true
+    });
+  }
+
+  selectUserInControlClick(newUserInControl) {
+    if (!this.state.userSwitcherFlag) {
+      return;
+    }
+
+    this.state.hubConnection.invoke("SetUserInControl", this.state.codeConnection.user, this.state.id, newUserInControl)
+      .then((r) => {
+        this.setState({
+          userSwitcherFlag: false
+        });
+      })
+      .then((r) => { return true; })
+      .catch(function (err) {
+        console.error(err.toString());
+        return false;
+      });
+  }
+
   render() {
     if (!this.state.codeConnection) {
       return (
         <div>
-          Nothing to render...
+          Code session {this.state.id} does not exist or has been removed.
         </div>
-        )
+      )
     }
-
 
     return (
       <div>
         <div>
+          <span>Participants:</span>
+          {this.state.codeConnection.codeSession.participants
+            ? this.state.codeConnection.codeSession.participants.map((p) =>
+              <span key={p} className="badge badge-secondary" onClick={() => this.selectUserInControlClick(p)}>
+                {p}
+                {this.state.codeConnection.codeSession.owner === p ? <>&nbsp;(Owner)</> : <></>}
+                {this.state.codeConnection.codeSession.userInControl === p ? <>&nbsp;(Editor)</> : <></>}
+              </span>
+            )
+            : <span>Unavailable</span>}
+          <button className="btn btn-info" onClick={(e) => { this.switchUserInControlClick(e) }}>
+            {this.state.userSwitcherFlag ? <>[click on user name/id to choose]</> : <>Give control</>}
+          </button>
+        </div>
+
+        <div>
+          <div>Toolbox</div>
           <label htmlFor="selectEditorMode">Syntax language:</label>
           <select id="selectEditorMode" value={this.state.editorMode} onChange={this.editorModeChange}>
             <option value="text/x-csharp">C#</option>
@@ -238,20 +297,6 @@ export class Code extends React.Component {
             <option value="sql">SQL</option>
             <option value="htmlmixed">HTML</option>
           </select>
-        </div>
-
-        <div>
-          <span>Participants:</span>
-          {this.state.codeConnection.codeSession.participants
-            ? this.state.codeConnection.codeSession.participants.map((p) =>
-              p === this.state.codeConnection.codeSession.owner
-                ? <span key={p} className="badge badge-secondary">{p} (Owner)</span>
-                : <span key={p} className="badge badge-secondary">{p}</span>)
-            : <span>Unavailable</span>}
-        </div>
-
-        <div>
-          <span>Actions:</span>
           <button className="btn btn-primary" onClick={(e) => { this.highlightSelectionClick(e, this.editorInstance) }}>Highlight selection</button>
           <button className="btn btn-danger" onClick={(e) => { this.highlightEraseClick(e, this.editorInstance) }}>Erase highlight</button>
         </div>
@@ -262,7 +307,7 @@ export class Code extends React.Component {
             autofocus: true,
             lineNumbers: true,
             mode: this.state.editorMode,
-            readOnly: this.state.codeConnection.role === 1
+            readOnly: !this.state.codeConnection.rights.canEdit
           }}
           editorDidMount={(editor) => {
             this.editorInstance = editor

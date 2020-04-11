@@ -9,6 +9,12 @@ namespace codescreenme.Data
   {
     public CodeSession CodeSession { get; set; }
     public string User { get; set; }
-    public CodeSessionRole Role { get; set; }
+    public CodeSessionRights Rights 
+    { 
+      get
+      {
+        return new CodeSessionRights(this.CodeSession.Owner == this.User, this.CodeSession.UserInControl == this.User);
+      }
+    }
   }
 }
