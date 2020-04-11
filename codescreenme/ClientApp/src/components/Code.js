@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2'
 import * as signalR from "@microsoft/signalr";
+import { Container } from 'reactstrap';
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
@@ -266,7 +267,7 @@ export class Code extends React.Component {
     }
 
     return (
-      <div>
+      <Container>
         <div>
           <span>Participants:</span>
           {this.state.codeConnection.codeSession.participants
@@ -323,7 +324,7 @@ export class Code extends React.Component {
           onChange={(editor, data, value) => {
           }}
         />
-      </div>
+      </Container>
     );
   }
 

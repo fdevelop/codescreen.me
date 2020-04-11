@@ -13,13 +13,35 @@ code {
   border-color: #1861ac;
 }
 
-.masthead {
-  height: 100vh;
-  min-height: 500px;
-  background-image: url('/IMG_7087.jpg');
-  background-size: cover;
+main.masthead {
+  padding-top: 10rem;
+  padding-bottom: calc(10rem - 4.5rem);
+  background: linear-gradient(to bottom, rgba(92, 77, 66, 0.8) 0%, rgba(92, 77, 66, 0.8) 100%), url('/IMG_7087.jpg');
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-size: cover;
+}
+
+@media (min-width: 492px) {
+  main.masthead {
+    height: calc(100vh - 60px);
+    min-height: 10rem;
+  }
+
+    main.masthead p {
+      font-size: 1.15rem;
+    }
+
+    main.masthead h1 {
+      font-size: 3rem;
+    }
+}
+
+@media (min-width: 1200px) {
+  main.masthead h1 {
+    font-size: 3.5rem;
+  }
 }
 
 .CodeMirror {
@@ -29,5 +51,17 @@ code {
 
 .red {
   background: #ff0000;
+}
+
+/*
+ * Footer
+ */
+.mastfoot {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px; /* Set the fixed height of the footer here */
+  background-color: #efefef;
+  font-size: 0.9rem;
 }
 
