@@ -267,27 +267,39 @@ export class Code extends React.Component {
     }
 
     return (
-      <Container>
-        <div>
-          <span>Participants:</span>
+      <Container className="py-3">
+        <div className="code-toolbox">
+          <span className="caption">Session</span>
+          <span>{this.state.id}</span>
+          <span className="float-right">
+            <a href={window.location.href} target="_blank">{window.location.href}</a>
+          </span>
+        </div>
+
+        <div className="code-toolbox">
+          <span className="caption">Participants</span>
           {this.state.codeConnection.codeSession.participants
             ? this.state.codeConnection.codeSession.participants.map((p) =>
               <span key={p} className="badge badge-secondary" onClick={() => this.selectUserInControlClick(p)}>
                 {p}
                 {this.state.codeConnection.codeSession.owner === p ? <>&nbsp;(Owner)</> : <></>}
                 {this.state.codeConnection.codeSession.userInControl === p ? <>&nbsp;(Editor)</> : <></>}
+                {this.state.codeConnection.codeSession.userInControl !== p ? <>&nbsp;(Spectator)</> : <></>}
+                {this.state.codeConnection.user === p ? <>&nbsp;(You)</> : <></>}
               </span>
             )
             : <span>Unavailable</span>}
-          <button className="btn btn-info" onClick={(e) => { this.switchUserInControlClick(e) }}>
-            {this.state.userSwitcherFlag ? <>[click on user name/id to choose]</> : <>Give control</>}
-          </button>
+          <span className="float-right">
+            <button disabled={!this.state.codeConnection.rights.canAdministrate} className="btn btn-info btn-sm" onClick={(e) => { this.switchUserInControlClick(e) }}>
+              {this.state.userSwitcherFlag ? <>[click on user name/id to choose]</> : <>Give control</>}
+            </button>
+          </span>
         </div>
 
-        <div>
-          <div>Toolbox</div>
-          <label htmlFor="selectEditorMode">Syntax language:</label>
-          <select id="selectEditorMode" value={this.state.editorMode} onChange={this.editorModeChange}>
+        <div className="code-toolbox">
+          <span className="caption">Toolbox</span>
+          <label className="shift" htmlFor="selectEditorMode">Syntax language</label>
+          <select disabled={!this.state.codeConnection.rights.canEdit} className="shift" id="selectEditorMode" value={this.state.editorMode} onChange={this.editorModeChange}>
             <option value="text/x-csharp">C#</option>
             <option value="text/x-java">Java</option>
             <option value="text/x-c++src">C/C++</option>
@@ -298,11 +310,16 @@ export class Code extends React.Component {
             <option value="sql">SQL</option>
             <option value="htmlmixed">HTML</option>
           </select>
-          <button className="btn btn-primary" onClick={(e) => { this.highlightSelectionClick(e, this.editorInstance) }}>Highlight selection</button>
-          <button className="btn btn-danger" onClick={(e) => { this.highlightEraseClick(e, this.editorInstance) }}>Erase highlight</button>
+          <label className="shift" htmlFor="highlightButtons">Highlight to all</label>
+          <span className="shift" id="highlightButtons">
+            <button disabled={!this.state.codeConnection.rights.canEdit} className="btn btn-primary btn-sm" onClick={(e) => { this.highlightSelectionClick(e, this.editorInstance) }}>Highlight selection</button>
+            <button disabled={!this.state.codeConnection.rights.canEdit} className="btn btn-danger btn-sm" onClick={(e) => { this.highlightEraseClick(e, this.editorInstance) }}>Erase highlight</button>
+          </span>
         </div>
 
+        <div className="codeArea">
         <CodeMirror
+          className="h-100"
           value={this.state.codeConnection.codeSession.code}
           options={{
             autofocus: true,
@@ -323,7 +340,8 @@ export class Code extends React.Component {
           }}
           onChange={(editor, data, value) => {
           }}
-        />
+          />
+        </div>
       </Container>
     );
   }
