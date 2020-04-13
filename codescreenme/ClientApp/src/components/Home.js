@@ -10,7 +10,7 @@ export class Home extends Component {
       <main className="masthead">
         <Container>
           <div className="row h-100 align-items-center">
-            <div className="col-12 text-center">
+            <div className="col-12 text-center text-white">
               <h1 className="font-weight-light">Run technical screening</h1>
               <p className="lead">Fast. Simple. Secure</p>
               <div>

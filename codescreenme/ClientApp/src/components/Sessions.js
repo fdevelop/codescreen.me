@@ -73,7 +73,7 @@ export class Sessions extends React.Component {
       : Sessions.renderTable(this.state.sessions, this);
 
     return (
-      <Container className="py-3">
+      <Container className="py-3 custom-page-area">
         <div className="row">
           <div className="col-sm">
             <h2 id="tabelLabel" >Sessions</h2>
@@ -83,6 +83,7 @@ export class Sessions extends React.Component {
           </div>
         </div>
         {contents}
+        <div className="footerFix"></div>
       </Container>
     );
   }

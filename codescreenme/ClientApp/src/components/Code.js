@@ -267,7 +267,7 @@ export class Code extends React.Component {
     }
 
     return (
-      <Container className="py-3">
+      <Container className="py-3 custom-page-area">
         <div className="code-toolbox">
           <span className="caption">Session</span>
           <span>{this.state.id}</span>
@@ -342,6 +342,7 @@ export class Code extends React.Component {
           }}
           />
         </div>
+        <div className="footerFix"></div>
       </Container>
     );
   }

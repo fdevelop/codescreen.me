@@ -2,6 +2,17 @@ html,
 body {
   font-size: 14px;
   font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  height: 100%;
+}
+
+#root {
+  min-height: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.custom-page-area {
+  min-height: calc(100vh - 60px);
 }
 
 a {
@@ -15,7 +26,7 @@ code {
 main.masthead {
   padding-top: 10rem;
   padding-bottom: calc(10rem - 4.5rem);
-  background: linear-gradient(to bottom, rgba(92, 77, 66, 0.8) 0%, rgba(92, 77, 66, 0.8) 100%), url('/IMG_7087.jpg');
+  background: linear-gradient(to bottom, rgba(92, 77, 66, 0.8) 0%, rgba(92, 77, 66, 0.8) 100%), url('/splash.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: scroll;
@@ -48,10 +59,7 @@ main.masthead {
 }
 
 .codeArea {
-  flex: 1 1 auto;
-  margin-top: 0;
-  height: 100%;
-  position: relative;
+  
 }
 
 .CodeMirror {
@@ -89,4 +97,10 @@ main.masthead {
   height: 60px; /* Set the fixed height of the footer here */
   background-color: #efefef;
   font-size: 0.9rem;
+  z-index: 10;
+}
+
+.footerFix {
+  display: block;
+  height: 60px;
 }
