@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Container } from 'reactstrap';
 
 export class Sessions extends React.Component {
   static displayName = Sessions.name;
@@ -72,19 +73,18 @@ export class Sessions extends React.Component {
       : Sessions.renderTable(this.state.sessions, this);
 
     return (
-      <div>
-        <div className="container">
-          <div className="row">
-            <div className="col-sm">
-              <h2 id="tabelLabel" >Sessions</h2>
-            </div>
-            <div className="col-sm">
-              <button className="btn btn-primary float-right" onClick={(e) => this.addSession(e)}>Create new session</button>
-            </div>
+      <Container className="py-3 custom-page-area">
+        <div className="row">
+          <div className="col-sm">
+            <h2 id="tabelLabel" >Sessions</h2>
+          </div>
+          <div className="col-sm">
+            <button className="btn btn-primary float-right" onClick={(e) => this.addSession(e)}>Create new session</button>
           </div>
         </div>
         {contents}
-      </div>
+        <div className="footerFix"></div>
+      </Container>
     );
   }
 
