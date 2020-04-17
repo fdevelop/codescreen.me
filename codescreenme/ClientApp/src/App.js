@@ -7,6 +7,7 @@ import { Code } from './components/Code';
 import { Sessions } from './components/Sessions';
 
 import './custom.css'
+import { CookiePolicy } from './components/CookiePolicy';
 
 export default class App extends Component {
   static displayName = App.name;
@@ -17,6 +18,7 @@ export default class App extends Component {
         <Route exact path='/' component={Home} />
         <Route path='/sessions' component={Sessions} />
         <Route path='/code' component={Code} />
+        <Route path='/articles/cookie' component={CookiePolicy} />
       </Layout>
     );
   }
