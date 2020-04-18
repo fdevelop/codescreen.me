@@ -7,6 +7,7 @@ import { Code } from './components/Code';
 import { Sessions } from './components/Sessions';
 
 import './custom.css'
+import { Help } from './components/Help';
 
 export default class App extends Component {
   static displayName = App.name;
@@ -17,6 +18,7 @@ export default class App extends Component {
         <Route exact path='/' component={Home} />
         <Route path='/sessions' component={Sessions} />
         <Route path='/code' component={Code} />
+        <Route path='/help' component={Help} />
       </Layout>
     );
   }
