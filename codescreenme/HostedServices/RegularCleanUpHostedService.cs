@@ -10,9 +10,9 @@ namespace codescreenme.HostedServices
 {
   public class RegularCleanUpHostedService : IHostedService, IDisposable
   {
-    public readonly static TimeSpan DefaultSessionLifetime = TimeSpan.FromMinutes(2);
+    public readonly static TimeSpan DefaultSessionLifetime = TimeSpan.FromHours(24);
 
-    private readonly static TimeSpan DefaultFrequency = TimeSpan.FromMinutes(1);
+    private readonly static TimeSpan DefaultFrequency = TimeSpan.FromHours(1);
 
     private Timer timer;
     private int executionCount = 0;
