@@ -21,7 +21,7 @@ export class Help extends React.Component {
           <div className="col-sm">
             <h4>Code sessions</h4>
             <p>Each code session can be shared with unlimited number of people. However, currently it's only one user can be owner and only one user can be Editor at any moment of time. The owner can change editor as many times as necessary. The owner cannot be changed.</p>
-            <p>Each session remains active and available as much as it is in use with a grace period of 30 minutes of inactivity - afterwards, session is archived (removed).</p>
+            <p>Each session remains active and available for 24 hours since its creation - afterwards, session is archived (removed).</p>
           </div>
         </div>
         <div className="row mb-2">

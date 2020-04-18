@@ -260,9 +260,9 @@ export class Code extends React.Component {
   render() {
     if (!this.state.codeConnection) {
       return (
-        <div>
+        <Container className="py-3 custom-page-area">
           Code session {this.state.id} does not exist or has been removed.
-        </div>
+        </Container>
       )
     }
 

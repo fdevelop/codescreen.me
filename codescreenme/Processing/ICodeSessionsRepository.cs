@@ -1,4 +1,5 @@
 ﻿using codescreenme.Data;
+using System;
 using System.Collections.Generic;
 
 namespace codescreenme.Processing
@@ -12,6 +13,8 @@ namespace codescreenme.Processing
     bool UpdateSessionEraseHighlights(string user, string id);
     bool UpdateSessionUserInControl(string user, string id, string newUserInControl);
     bool RemoveSession(string user, string id);
+    bool ArchiveSession(string user, string id);
     IEnumerable<CodeSession> GetUserOwnedSessions(string user);
+    IEnumerable<CodeSession> GetAllSessionsByDateRange(DateTime from, DateTime to);
   }
 }

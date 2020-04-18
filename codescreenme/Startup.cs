@@ -1,3 +1,4 @@
+using codescreenme.HostedServices;
 using codescreenme.Hubs;
 using codescreenme.Processing;
 using Microsoft.AspNetCore.Builder;
@@ -45,6 +46,8 @@ namespace codescreenme
         options.Cookie.HttpOnly = true;
         options.Cookie.IsEssential = true;
       });
+
+      services.AddHostedService<RegularCleanUpHostedService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

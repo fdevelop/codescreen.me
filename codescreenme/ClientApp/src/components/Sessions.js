@@ -48,7 +48,8 @@ export class Sessions extends React.Component {
       <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
           <tr>
-            <th>Date</th>
+            <th>Created Date</th>
+            <th>Expiration Date</th>
             <th>Id</th>
             <th>Actions</th>
           </tr>
@@ -57,6 +58,7 @@ export class Sessions extends React.Component {
           {data.map(obj =>
             <tr key={obj.id}>
               <td>{obj.dateCreated}</td>
+              <td>{obj.dateExpiration}</td>
               <td>{obj.id}</td>
               <td><a className="btn btn-primary btn-sm" href={"/code/" + obj.id}>Join session</a>
                 &nbsp;<button className="btn btn-danger btn-sm" onClick={(e) => selfReference.removeSession(obj.id, e)}>Delete session</button></td>
