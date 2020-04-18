@@ -1,4 +1,5 @@
-﻿using System;
+﻿using codescreenme.HostedServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,14 @@ namespace codescreenme.Data
     public string Owner { get; set; }
     public string UserInControl { get; set; }
     public IList<string> Participants { get; set; }
+
+    public DateTime DateExpiration
+    {
+      get
+      {
+        return this.DateCreated.Add(RegularCleanUpHostedService.DefaultSessionLifetime);
+      }
+    }
 
     public CodeSession()
     {

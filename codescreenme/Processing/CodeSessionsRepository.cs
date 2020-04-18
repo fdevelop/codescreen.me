@@ -28,6 +28,11 @@ namespace codescreenme.Processing
     public CodeConnection GetSessionById(string user, string id)
     {
       var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      if (element == null)
+      {
+        return null;
+      }
+
       var codeConnection = new CodeConnection() { CodeSession = element, User = user };
 
       if (!codeConnection.CodeSession.Participants.Contains(user))
@@ -88,9 +93,19 @@ namespace codescreenme.Processing
       return element == null ? false : this.codeSessions.Remove(element);
     }
 
+    public bool ArchiveSession(string user, string id)
+    {
+      return this.RemoveSession(user, id);
+    }
+
     public IEnumerable<CodeSession> GetUserOwnedSessions(string user)
     {
       return this.codeSessions.Where(cs => cs.Owner == user);
+    }
+
+    public IEnumerable<CodeSession> GetAllSessionsByDateRange(DateTime from, DateTime to)
+    {
+      return this.codeSessions.Where(cs => cs.DateCreated > from && cs.DateCreated < to);
     }
   }
 }
