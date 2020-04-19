@@ -5,7 +5,7 @@ CodeScreen.me is an open-source SaaS project to help conducting technical code s
 Go to https://codescreen.me and use the service.
 
 ## How to build
-Clone repository and generate container image out of /codescreen.me/Dockerfile.
+Clone repository and generate container image out of /codescreenme/Dockerfile.
 
 ## Hot to develop/contribute
 Solution stack is based on the following technologies
@@ -14,3 +14,5 @@ Solution stack is based on the following technologies
 * SignalR
 
 Contributions in the form of issue reports, issue fixes or functionality improvements are welcome!
+
+Production hosting is delivered via Microsoft Azure, simple code delivery automation is organazied with DockerHub+Azure. 
