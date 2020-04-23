@@ -13,6 +13,7 @@ namespace codescreenme.Data
     public string Id { get; set; }
     public DateTime DateCreated { get; set; }
     public string Code { get; set; }
+    public string CodeSyntax { get; set; }
     public IList<CodeCursor> CodeHighlights { get; set; }
     public string Owner { get; set; }
     public string UserInControl { get; set; }

@@ -27,7 +27,6 @@ export class Code extends React.Component {
     this.state = {
       id: idFromUrl,
       codeConnection: null,
-      editorMode: 'text/x-csharp',
       loading: true,
       userSwitcherFlag: false,
       hubConnection: null
@@ -43,10 +42,15 @@ export class Code extends React.Component {
     this.highlightEraseClick = this.highlightEraseClick.bind(this);
     this.highlightSelectionClick = this.highlightSelectionClick.bind(this);
 
-    this.receiveCodeUpdateListener = this.receiveCodeUpdateListener.bind(this);
     this.setCodeHighlightListener = this.setCodeHighlightListener.bind(this);
     this.removeCodeHighlightsListener = this.removeCodeHighlightsListener.bind(this);
+
+    this.receiveCodeUpdateListener = this.receiveCodeUpdateListener.bind(this);
     this.sendCodeUpdate = this.sendCodeUpdate.bind(this);
+
+    this.receiveCodeSyntaxUpdateListener = this.receiveCodeSyntaxUpdateListener.bind(this);
+    this.sendCodeSyntaxUpdate = this.sendCodeSyntaxUpdate.bind(this);
+
     this.participantListener = this.participantListener.bind(this);
     this.participantJoined = this.participantJoined.bind(this);
     this.setUserInControlListener = this.setUserInControlListener.bind(this);
@@ -82,6 +86,9 @@ export class Code extends React.Component {
         .on("ReceiveCodeUpdate", this.receiveCodeUpdateListener);
 
       this.state.hubConnection
+        .on("ReceiveCodeSyntaxUpdate", this.receiveCodeSyntaxUpdateListener);
+
+      this.state.hubConnection
         .on("RemoveCodeHighlights", this.removeCodeHighlightsListener);
 
       this.state.hubConnection
@@ -102,6 +109,17 @@ export class Code extends React.Component {
 
     let newCodeConnection = this.state.codeConnection;
     newCodeConnection.codeSession.code = code;
+
+    this.setState({ codeConnection: newCodeConnection });
+  }
+
+  receiveCodeSyntaxUpdateListener(user, sessionId, syntax) {
+    if (this.state.id !== sessionId || this.state.codeConnection.user === user || this.state.codeConnection.rights.canEdit) {
+      return;
+    }
+
+    let newCodeConnection = this.state.codeConnection;
+    newCodeConnection.codeSession.codeSyntax = syntax;
 
     this.setState({ codeConnection: newCodeConnection });
   }
@@ -220,6 +238,15 @@ export class Code extends React.Component {
       });
   }
 
+  sendCodeSyntaxUpdate(newCodeSyntaxValue) {
+    this.state.hubConnection.invoke("ReceiveCodeSyntaxUpdate", this.state.codeConnection.user, this.state.id, newCodeSyntaxValue)
+      .then(function (r) { return true; })
+      .catch(function (err) {
+        console.error(err.toString());
+        return false;
+      });
+  }
+
   participantJoined() {
     this.state.hubConnection.invoke("ParticipantJoined", this.state.codeConnection.user, this.state.id)
       .then(function (r) { return true; })
@@ -299,7 +326,8 @@ export class Code extends React.Component {
         <div className="code-toolbox">
           <span className="caption">Toolbox</span>
           <label className="shift" htmlFor="selectEditorMode">Syntax language</label>
-          <select disabled={!this.state.codeConnection.rights.canEdit} className="shift" id="selectEditorMode" value={this.state.editorMode} onChange={this.editorModeChange}>
+          <select disabled={!this.state.codeConnection.rights.canEdit} className="shift"
+            id="selectEditorMode" value={this.state.codeConnection.codeSession.codeSyntax} onChange={this.editorModeChange}>
             <option value="text/x-csharp">C#</option>
             <option value="text/x-java">Java</option>
             <option value="text/x-c++src">C/C++</option>
@@ -309,6 +337,7 @@ export class Code extends React.Component {
             <option value="powershell">PowerShell</option>
             <option value="sql">SQL</option>
             <option value="htmlmixed">HTML</option>
+            <option value="">[Plain text]</option>
           </select>
           <label className="shift" htmlFor="highlightButtons">Highlight to all</label>
           <span className="shift" id="highlightButtons">
@@ -324,7 +353,7 @@ export class Code extends React.Component {
           options={{
             autofocus: true,
             lineNumbers: true,
-            mode: this.state.editorMode,
+            mode: this.state.codeConnection.codeSession.codeSyntax,
             readOnly: !this.state.codeConnection.rights.canEdit
           }}
           editorDidMount={(editor) => {
@@ -348,7 +377,12 @@ export class Code extends React.Component {
   }
 
   editorModeChange(event) {
-    this.setState({ editorMode: event.target.value });
+    let newCodeConnection = this.state.codeConnection;
+    newCodeConnection.codeSession.codeSyntax = event.target.value;
+
+    this.sendCodeSyntaxUpdate(event.target.value);
+
+    this.setState({ codeConnection: newCodeConnection });
   }
 
   async populateData() {

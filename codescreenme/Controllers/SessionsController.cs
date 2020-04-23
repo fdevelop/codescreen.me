@@ -52,6 +52,7 @@ namespace codescreenme.Controllers
         DateCreated = codeSession == null ? DateTime.UtcNow : codeSession.DateCreated,
         Owner = user,
         UserInControl = user,
+        CodeSyntax = "text/x-csharp",
         Participants = new List<string>(new string[] { user })
       };
 
