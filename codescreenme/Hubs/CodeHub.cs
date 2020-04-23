@@ -25,6 +25,12 @@ namespace codescreenme.Hubs
       await Clients.All.SendAsync("ReceiveCodeUpdate", user, sessionId, code);
     }
 
+    public async Task ReceiveCodeSyntaxUpdate(string user, string sessionId, string syntax)
+    {
+      this.codeSessionsRepository.UpdateSessionSyntax(user, sessionId, syntax);
+      await Clients.All.SendAsync("ReceiveCodeSyntaxUpdate", user, sessionId, syntax);
+    }
+
     public async Task RemoveCodeHighlights(string user, string sessionId)
     {
       this.codeSessionsRepository.UpdateSessionEraseHighlights(user, sessionId);

@@ -54,6 +54,17 @@ namespace codescreenme.Processing
       return true;
     }
 
+    public bool UpdateSessionSyntax(string user, string id, string syntax)
+    {
+      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      if (element == null)
+        return false;
+
+      element.CodeSyntax = syntax;
+
+      return true;
+    }
+
     public bool UpdateSessionEraseHighlights(string user, string id)
     {
       var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
