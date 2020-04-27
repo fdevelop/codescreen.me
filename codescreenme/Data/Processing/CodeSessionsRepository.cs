@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace codescreenme.Processing
+namespace codescreenme.Data.Processing
 {
-  public class CodeSessionsRepository : ICodeSessionsRepository
+  public class InMemoryCodeSessionsRepository : ICodeSessionsRepository
   {
     private IList<CodeSession> codeSessions { get; set; }
 
-    public CodeSessionsRepository()
+    public InMemoryCodeSessionsRepository()
     {
       this.codeSessions = new List<CodeSession>();
     }
 
-    public CodeSessionsRepository(IEnumerable<CodeSession> codeSessions)
+    public InMemoryCodeSessionsRepository(IEnumerable<CodeSession> codeSessions)
     {
       this.codeSessions = new List<CodeSession>(codeSessions);
     }
