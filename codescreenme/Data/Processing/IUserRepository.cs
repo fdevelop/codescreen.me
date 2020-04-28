@@ -1,4 +1,4 @@
-﻿namespace codescreenme.Processing
+﻿namespace codescreenme.Data.Processing
 {
   public interface IUserRepository
   {

@@ -1,6 +1,6 @@
 using codescreenme.HostedServices;
 using codescreenme.Hubs;
-using codescreenme.Processing;
+using codescreenme.Data.Processing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,7 +29,7 @@ namespace codescreenme
 
       services.AddHttpContextAccessor();
       services.AddSingleton<IUserRepository, UserRepository>();
-      services.AddSingleton<ICodeSessionsRepository, CodeSessionsRepository>();
+      services.AddSingleton<ICodeSessionsRepository, InMemoryCodeSessionsRepository>();
 
       // In production, the React files will be served from this directory
       services.AddSpaStaticFiles(configuration =>
