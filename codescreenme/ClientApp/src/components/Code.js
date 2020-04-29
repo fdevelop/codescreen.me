@@ -14,8 +14,9 @@ require('codemirror/mode/python/python.js');
 require('codemirror/mode/powershell/powershell.js');
 require('codemirror/mode/shell/shell.js');
 require('codemirror/mode/sql/sql.js');
+require('codemirror/mode/php/php.js');
 
-export class Code extends React.Component {
+export class Code extends Component {
   static displayName = Code.name;
 
   constructor(props) {
@@ -299,7 +300,7 @@ export class Code extends React.Component {
           <span className="caption">Session</span>
           <span>{this.state.id}</span>
           <span className="float-right">
-            <a href={window.location.href} target="_blank">{window.location.href}</a>
+            <a href={window.location.href} target="_blank" rel="noopener noreferrer">{window.location.href}</a>
           </span>
         </div>
 
@@ -337,6 +338,7 @@ export class Code extends React.Component {
             <option value="powershell">PowerShell</option>
             <option value="sql">SQL</option>
             <option value="htmlmixed">HTML</option>
+            <option value="php">PHP</option>
             <option value="">[Plain text]</option>
           </select>
           <label className="shift" htmlFor="highlightButtons">Highlight to all</label>
