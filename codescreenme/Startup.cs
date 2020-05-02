@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using codescreenme.Data.Processing.Sql;
 
 namespace codescreenme
 {
@@ -28,8 +29,10 @@ namespace codescreenme
       services.AddControllersWithViews();
 
       services.AddHttpContextAccessor();
-      services.AddSingleton<IUserRepository, UserRepository>();
-      services.AddSingleton<ICodeSessionsRepository, InMemoryCodeSessionsRepository>();
+
+      services.AddScoped<IUserRepository, UserRepository>();
+      services.AddScoped<IPersistentStorageProvider, SqlPersistentStorageProvider>(s => new SqlPersistentStorageProvider(Configuration.GetConnectionString("DefaultConnection")));
+      services.AddScoped<ICodeSessionsRepository, PersistentCodeSessionsRepository>();
 
       // In production, the React files will be served from this directory
       services.AddSpaStaticFiles(configuration =>
@@ -48,6 +51,7 @@ namespace codescreenme
       });
 
       services.AddHostedService<RegularCleanUpHostedService>();
+      services.AddHostedService<PersistentDataUpdaterHostedService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
