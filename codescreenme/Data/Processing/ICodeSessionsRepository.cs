@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace codescreenme.Processing
+namespace codescreenme.Data.Processing
 {
   public interface ICodeSessionsRepository
   {
@@ -10,6 +10,7 @@ namespace codescreenme.Processing
     CodeConnection GetSessionById(string user, string id);
     bool UpdateSession(string user, string id, string code);
     bool UpdateSession(string user, string id, CodeCursor codeCursor);
+    bool UpdateSessionSyntax(string user, string id, string syntax);
     bool UpdateSessionEraseHighlights(string user, string id);
     bool UpdateSessionUserInControl(string user, string id, string newUserInControl);
     bool RemoveSession(string user, string id);

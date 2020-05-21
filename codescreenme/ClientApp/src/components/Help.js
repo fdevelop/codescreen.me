@@ -1,8 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Container } from 'reactstrap';
-import { Link } from 'react-router-dom';
 
-export class Help extends React.Component {
+export class Help extends Component {
   static displayName = Help.name;
 
   constructor(props) {
@@ -39,7 +38,7 @@ export class Help extends React.Component {
         <div className="row mb-2">
           <div className="col-sm">
             <h4>Feedback</h4>
-            <p>Any issues or suggestions can be reported via <a href="https://github.com/fdevelop/codescreen.me" target="_blank">GitHub project page</a>.</p>
+            <p>Any issues or suggestions can be reported via <a href="https://github.com/fdevelop/codescreen.me" target="_blank" rel="noopener noreferrer">GitHub project page</a>.</p>
           </div>
         </div>
         <div className="footerFix"></div>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using codescreenme.Data;
-using codescreenme.Processing;
+using codescreenme.Data.Processing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -52,6 +52,7 @@ namespace codescreenme.Controllers
         DateCreated = codeSession == null ? DateTime.UtcNow : codeSession.DateCreated,
         Owner = user,
         UserInControl = user,
+        CodeSyntax = "text/x-csharp",
         Participants = new List<string>(new string[] { user })
       };
 
