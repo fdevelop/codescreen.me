@@ -68,7 +68,13 @@ namespace codescreenme.Data.Processing
     {
       codeSessions.Add(codeSession.Id, codeSession);
 
-      this.persistentStorageProvider.AddCodeSession(codeSession);
+      try
+      {
+        this.persistentStorageProvider.AddCodeSession(codeSession);
+      }
+      catch (Exception ex)
+      {
+      }
     }
 
     public IEnumerable<CodeSession> GetAllSessionsByDateRange(DateTime from, DateTime to)
@@ -80,7 +86,13 @@ namespace codescreenme.Data.Processing
     {
       if (!codeSessions.ContainsKey(id))
       {
-        return null;
+        var csFromDb = this.persistentStorageProvider.GetCodeSession(id);
+        if (csFromDb == null)
+        {
+          return null;
+        }
+
+        codeSessions.Add(id, csFromDb);
       }
 
       return codeSessions[id];
