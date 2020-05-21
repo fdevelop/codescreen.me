@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Container } from 'reactstrap';
 
-export class Sessions extends React.Component {
+export class Sessions extends Component {
   static displayName = Sessions.name;
 
   constructor(props) {

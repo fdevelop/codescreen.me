@@ -1,5 +1,5 @@
 ﻿using codescreenme.Data;
-using codescreenme.Processing;
+using codescreenme.Data.Processing;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,12 @@ namespace codescreenme.Hubs
     {
       this.codeSessionsRepository.UpdateSession(user, sessionId, code);
       await Clients.All.SendAsync("ReceiveCodeUpdate", user, sessionId, code);
+    }
+
+    public async Task ReceiveCodeSyntaxUpdate(string user, string sessionId, string syntax)
+    {
+      this.codeSessionsRepository.UpdateSessionSyntax(user, sessionId, syntax);
+      await Clients.All.SendAsync("ReceiveCodeSyntaxUpdate", user, sessionId, syntax);
     }
 
     public async Task RemoveCodeHighlights(string user, string sessionId)

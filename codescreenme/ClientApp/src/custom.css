@@ -104,3 +104,12 @@ main.masthead {
   display: block;
   height: 60px;
 }
+
+.custom-page-area, .codeArea, .react-codemirror2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.CodeMirror {
+    flex-grow: 1;
+}
