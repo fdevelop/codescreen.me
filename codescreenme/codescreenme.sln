@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "codescreenme", "codescreenme.csproj", "{B1FEDC98-2172-4DCD-99F7-A270B661F8CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "codescreenme.tests", "..\codescreenme.tests\codescreenme.tests.csproj", "{C3D40C67-BD03-4FE4-B071-5606FA1AFC8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "codescreenme.tests", "..\codescreenme.tests\codescreenme.tests.csproj", "{C3D40C67-BD03-4FE4-B071-5606FA1AFC8B}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "codescreenme.database", "..\codescreenme.database\codescreenme.database.sqlproj", "{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,12 @@ Global
 		{C3D40C67-BD03-4FE4-B071-5606FA1AFC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3D40C67-BD03-4FE4-B071-5606FA1AFC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3D40C67-BD03-4FE4-B071-5606FA1AFC8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1613FCA3-4E64-41E6-8F2E-39AA206E24C0}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

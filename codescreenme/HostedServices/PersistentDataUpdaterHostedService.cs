@@ -9,17 +9,15 @@ using System.Threading.Tasks;
 
 namespace codescreenme.HostedServices
 {
-  public class RegularCleanUpHostedService : IHostedService, IDisposable
+  public class PersistentDataUpdaterHostedService : IHostedService, IDisposable
   {
-    public readonly static TimeSpan DefaultSessionLifetime = TimeSpan.FromHours(24);
-
-    private readonly static TimeSpan DefaultFrequency = TimeSpan.FromHours(1);
+    private readonly static TimeSpan DefaultFrequency = TimeSpan.FromMinutes(1);
 
     private Timer timer;
 
     private readonly IServiceScopeFactory scopeFactory;
 
-    public RegularCleanUpHostedService(IServiceScopeFactory scopeFactory)
+    public PersistentDataUpdaterHostedService(IServiceScopeFactory scopeFactory)
     {
       this.scopeFactory = scopeFactory;
     }
@@ -27,7 +25,7 @@ namespace codescreenme.HostedServices
     public Task StartAsync(CancellationToken cancellationToken)
     {
       this.timer = new Timer(DoWork, null, TimeSpan.Zero, DefaultFrequency);
-
+      
       return Task.CompletedTask;
     }
 
@@ -37,13 +35,20 @@ namespace codescreenme.HostedServices
       {
         var codeSessionsRepo = scope.ServiceProvider.GetRequiredService<ICodeSessionsRepository>();
 
-        var allSessionsToCleanUp = codeSessionsRepo.GetAllSessionsByDateRange(DateTime.MinValue, DateTime.UtcNow.Subtract(DefaultSessionLifetime));
-        foreach (var sessionId in allSessionsToCleanUp.Select(cs => cs.Id).ToArray())
+        var updateQueueIds = (codeSessionsRepo as ICodeUpdateQueue).GetUpdateQueueSnapshot();
+
+        foreach (var id in updateQueueIds)
         {
-          codeSessionsRepo.ArchiveSession("[system]", sessionId);
+          try
+          {
+            (codeSessionsRepo as ICodeUpdateQueue).UpdateRecord(id);
+          }
+          catch (Exception)
+          {
+            (codeSessionsRepo as ICodeUpdateQueue).AddToUpdateQueue(id);
+          }
         }
       }
-
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
