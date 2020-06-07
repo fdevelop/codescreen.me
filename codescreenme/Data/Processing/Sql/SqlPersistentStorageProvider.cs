@@ -16,7 +16,7 @@ namespace codescreenme.Data.Processing.Sql
     private string connectionString;
     public SqlPersistentStorageProvider(IOptions<DatabaseOptions> options, ILoggerFactory loggerFactory)
     {
-      this.connectionString = options.Value.ConnectionString;
+      this.connectionString = options.Value.DefaultConnection;
       this.logger = loggerFactory.CreateLogger("SqlPersistentStorageProvider");
     }
 

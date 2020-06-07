@@ -32,7 +32,7 @@ namespace codescreenme
 
       services.AddHttpContextAccessor();
       
-      services.Configure<DatabaseOptions>(Configuration.GetSection("DefaultConnection"));
+      services.Configure<DatabaseOptions>(Configuration.GetSection("ConnectionStrings"));
 
       services.AddScoped<IUserRepository, UserRepository>();
       services.AddScoped<IPersistentStorageProvider, SqlPersistentStorageProvider>();
