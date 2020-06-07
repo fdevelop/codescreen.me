@@ -13,16 +13,15 @@ namespace codescreenme.tests.Data.Processing
   class PersistentSqlCodeSessionsRepositoryTests : CodeSessionsRepositoryTests
   {
     private Mock<IPersistentStorageProvider> mockProvider;
-    private Mock<ILoggerFactory> mockLogger;
+    private ILoggerFactory consoleLogger;
 
     internal override void SetCodeRepo()
     {
-      if (this.codeSessionsRepository == null)
-      {
-        this.mockProvider = new Mock<IPersistentStorageProvider>();
-        this.mockLogger = new Mock<ILoggerFactory>();
-        this.codeSessionsRepository = new PersistentCodeSessionsRepository(mockProvider.Object, mockLogger.Object);
-      }
+      this.mockProvider = new Mock<IPersistentStorageProvider>();
+      this.consoleLogger = LoggerFactory.Create(builder => builder.AddConsole());
+      this.codeSessionsRepository = new PersistentCodeSessionsRepository(mockProvider.Object, consoleLogger);
+      
+      PersistentCodeSessionsRepository.ResetState();
     }
 
     [Test]

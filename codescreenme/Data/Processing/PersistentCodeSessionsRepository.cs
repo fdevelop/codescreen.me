@@ -27,6 +27,14 @@ namespace codescreenme.Data.Processing
       flagCacheLoaded = false;
     }
 
+    internal static void ResetState()
+    {
+      codeSessions.Clear();
+      flagCacheLoaded = false;
+
+      codeSessionUpdates.Clear();
+    }
+
     public PersistentCodeSessionsRepository(IPersistentStorageProvider provider, ILoggerFactory loggerFactory)
     {
       this.persistentStorageProvider = provider;
@@ -134,8 +142,8 @@ namespace codescreenme.Data.Processing
 
       try
       {
-        var dbRemove = this.persistentStorageProvider.RemoveCodeSession(id);
         var cacheRemove = codeSessions.Remove(id);
+        var dbRemove = this.persistentStorageProvider.RemoveCodeSession(id);
 
         return dbRemove && cacheRemove;
       }
