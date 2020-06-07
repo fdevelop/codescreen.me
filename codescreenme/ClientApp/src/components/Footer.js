@@ -10,7 +10,7 @@ export class Footer extends Component {
     return (
       <footer className="mastfoot mt-auto border-top box-shadow py-3">
         <Container>
-          <p><a href="/">CodeScreen.me</a> is an open-source SaaS project. Follow <a href="https://github.com/fdevelop/codescreen.me" target="_blank">GitHub</a> page for more information.</p>
+          <p><a href="/">CodeScreen.me</a> is an open-source SaaS project. Follow <a href="https://github.com/fdevelop/codescreen.me" target="_blank" rel="noopener noreferrer">GitHub</a> page for more information.</p>
         </Container>
       </footer>
     );
