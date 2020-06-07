@@ -3,13 +3,14 @@ using codescreenme.Data.Processing;
 using NUnit.Framework;
 using System;
 using System.Linq;
+using System.Threading;
 
 namespace codescreenme.tests.Data.Processing
 {
   abstract class CodeSessionsRepositoryTests
   {
     protected ICodeSessionsRepository codeSessionsRepository;
-    private const string User = "[unit-test]";
+    protected const string User = "[unit-test]";
 
     [SetUp]
     public void Setup()
@@ -20,8 +21,10 @@ namespace codescreenme.tests.Data.Processing
     internal abstract void SetCodeRepo();
 
     [Test]
-    public void TestAdding()
+    public virtual void TestAdding()
     {
+      var startCount = this.codeSessionsRepository.GetUserOwnedSessions(User).Count();
+
       CodeSession cs = new CodeSession()
       {
         Owner = User
@@ -32,13 +35,15 @@ namespace codescreenme.tests.Data.Processing
 
       var result = this.codeSessionsRepository.GetUserOwnedSessions(User);
 
-      Assert.AreEqual(result.Count(), 1);
-      Assert.AreEqual(result.First().Id, id);
+      Assert.AreEqual(startCount + 1, result.Count());
+      Assert.AreEqual(id, result.First().Id);
     }
 
     [Test]
-    public void TestRemoving()
+    public virtual void TestRemoving()
     {
+      var startStateCount = this.codeSessionsRepository.GetUserOwnedSessions(User).Count();
+
       CodeSession cs = new CodeSession()
       {
         Owner = User
@@ -51,13 +56,16 @@ namespace codescreenme.tests.Data.Processing
 
       var currentState = this.codeSessionsRepository.GetUserOwnedSessions(User);
 
-      Assert.AreEqual(removeOp, true);
-      Assert.AreEqual(currentState.Count(), 0);
+      Assert.AreEqual(true, removeOp);
+      Assert.AreEqual(startStateCount, currentState.Count());
     }
 
     [Test]
-    public void TestGetting()
+    public virtual void TestGetting()
     {
+      var startDate = DateTime.UtcNow;
+      Thread.Sleep(2000);
+
       CodeSession cs = new CodeSession()
       {
         Owner = User
@@ -78,13 +86,13 @@ namespace codescreenme.tests.Data.Processing
 
       this.codeSessionsRepository.CreateNewSession(cs2);
 
-      var result2 = this.codeSessionsRepository.GetAllSessionsByDateRange(DateTime.MinValue, DateTime.UtcNow);
+      var result2 = this.codeSessionsRepository.GetAllSessionsByDateRange(startDate, DateTime.UtcNow);
 
       Assert.AreEqual(result2.Count(), 2);
     }
 
     [Test]
-    public void TestUpdate()
+    public virtual void TestUpdate()
     {
       const string Old = "Hello World!";
       const string New = "Nope";
@@ -103,9 +111,9 @@ namespace codescreenme.tests.Data.Processing
       this.codeSessionsRepository.UpdateSession(User, id, New);
 
       var result = this.codeSessionsRepository.GetUserOwnedSessions(User);
-      var onlySession = result.First();
+      var onlySession = result.First(s => s.Id == id);
 
-      Assert.AreEqual(onlySession.Code, New);
+      Assert.AreEqual(New, onlySession.Code);
 
       // update highlight
 
@@ -117,37 +125,37 @@ namespace codescreenme.tests.Data.Processing
       this.codeSessionsRepository.UpdateSession(User, id, highlightOne);
 
       result = this.codeSessionsRepository.GetUserOwnedSessions(User);
-      onlySession = result.First();
+      onlySession = result.First(s => s.Id == id);
 
-      Assert.AreEqual(onlySession.CodeHighlights.Count, 1);
-      Assert.AreEqual(onlySession.CodeHighlights.First().HighlightTo.Ch, 2);
+      Assert.AreEqual(1, onlySession.CodeHighlights.Count);
+      Assert.AreEqual(2, onlySession.CodeHighlights.First().HighlightTo.Ch);
 
       // update highlight erase
       this.codeSessionsRepository.UpdateSessionEraseHighlights(User, id);
 
       result = this.codeSessionsRepository.GetUserOwnedSessions(User);
-      onlySession = result.First();
+      onlySession = result.First(s => s.Id == id);
 
-      Assert.AreEqual(onlySession.CodeHighlights.Count, 0);
+      Assert.AreEqual(0, onlySession.CodeHighlights.Count);
 
       // update syntax
       const string NewSyntax = "nothing";
       this.codeSessionsRepository.UpdateSessionSyntax(User, id, NewSyntax);
 
       result = this.codeSessionsRepository.GetUserOwnedSessions(User);
-      onlySession = result.First();
+      onlySession = result.First(s => s.Id == id);
 
-      Assert.AreEqual(onlySession.CodeSyntax, NewSyntax);
+      Assert.AreEqual(NewSyntax, onlySession.CodeSyntax);
 
       // update user in control
       const string NewUser = "newUser";
       this.codeSessionsRepository.UpdateSessionUserInControl(User, id, NewUser);
 
       result = this.codeSessionsRepository.GetUserOwnedSessions(User);
-      onlySession = result.First();
+      onlySession = result.First(s => s.Id == id);
 
-      Assert.AreEqual(onlySession.UserInControl, NewUser);
-      Assert.AreEqual(onlySession.Owner, User);
+      Assert.AreEqual(NewUser, onlySession.UserInControl);
+      Assert.AreEqual(User, onlySession.Owner);
     }
   }
 }

@@ -8,26 +8,21 @@ namespace codescreenme.Data.Processing
 {
   public class InMemoryCodeSessionsRepository : ICodeSessionsRepository
   {
-    private IList<CodeSession> codeSessions { get; set; }
+    private static IList<CodeSession> codeSessions { get; set; }
 
-    public InMemoryCodeSessionsRepository()
+    static InMemoryCodeSessionsRepository()
     {
-      this.codeSessions = new List<CodeSession>();
-    }
-
-    public InMemoryCodeSessionsRepository(IEnumerable<CodeSession> codeSessions)
-    {
-      this.codeSessions = new List<CodeSession>(codeSessions);
+      codeSessions = new List<CodeSession>();
     }
 
     public void CreateNewSession(CodeSession codeSession)
     {
-      this.codeSessions.Add(codeSession);
+      codeSessions.Add(codeSession);
     }
 
     public CodeConnection GetSessionById(string user, string id)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
       if (element == null)
       {
         return null;
@@ -45,7 +40,7 @@ namespace codescreenme.Data.Processing
 
     public bool UpdateSession(string user, string id, CodeCursor codeCursor)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
       if (element == null)
         return false;
 
@@ -56,7 +51,7 @@ namespace codescreenme.Data.Processing
 
     public bool UpdateSessionSyntax(string user, string id, string syntax)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
       if (element == null)
         return false;
 
@@ -67,7 +62,7 @@ namespace codescreenme.Data.Processing
 
     public bool UpdateSessionEraseHighlights(string user, string id)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
       if (element == null)
         return false;
 
@@ -78,7 +73,7 @@ namespace codescreenme.Data.Processing
 
     public bool UpdateSession(string user, string id, string code)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
       if (element == null)
         return false;
 
@@ -89,7 +84,7 @@ namespace codescreenme.Data.Processing
 
     public bool UpdateSessionUserInControl(string user, string id, string newUserInControl)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
       if (element == null)
         return false;
 
@@ -100,8 +95,8 @@ namespace codescreenme.Data.Processing
 
     public bool RemoveSession(string user, string id)
     {
-      var element = this.codeSessions.FirstOrDefault(cs => cs.Id == id);
-      return element == null ? false : this.codeSessions.Remove(element);
+      var element = codeSessions.FirstOrDefault(cs => cs.Id == id);
+      return element == null ? false : codeSessions.Remove(element);
     }
 
     public bool ArchiveSession(string user, string id)
@@ -111,12 +106,12 @@ namespace codescreenme.Data.Processing
 
     public IEnumerable<CodeSession> GetUserOwnedSessions(string user)
     {
-      return this.codeSessions.Where(cs => cs.Owner == user);
+      return codeSessions.Where(cs => cs.Owner == user);
     }
 
     public IEnumerable<CodeSession> GetAllSessionsByDateRange(DateTime from, DateTime to)
     {
-      return this.codeSessions.Where(cs => cs.DateCreated > from && cs.DateCreated < to);
+      return codeSessions.Where(cs => cs.DateCreated > from && cs.DateCreated < to);
     }
   }
 }
