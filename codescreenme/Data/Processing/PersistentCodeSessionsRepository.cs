@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,8 @@ namespace codescreenme.Data.Processing
 
     private readonly IPersistentStorageProvider persistentStorageProvider;
 
+    private ILogger logger;
+
     static PersistentCodeSessionsRepository()
     {
       codeSessions = new Dictionary<string, CodeSession>();
@@ -24,9 +27,10 @@ namespace codescreenme.Data.Processing
       flagCacheLoaded = false;
     }
 
-    public PersistentCodeSessionsRepository(IPersistentStorageProvider provider)
+    public PersistentCodeSessionsRepository(IPersistentStorageProvider provider, ILoggerFactory loggerFactory)
     {
       this.persistentStorageProvider = provider;
+      this.logger = loggerFactory.CreateLogger("PersistentCodeSessionsRepository");
 
       this.Init();
     }
@@ -74,6 +78,7 @@ namespace codescreenme.Data.Processing
       }
       catch (Exception ex)
       {
+        this.logger.LogError(ex, "creating new session {id} failed", codeSession.Id);
       }
     }
 

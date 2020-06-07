@@ -1,4 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,11 +11,15 @@ namespace codescreenme.Data.Processing.Sql
 {
   public class SqlPersistentStorageProvider : IPersistentStorageProvider
   {
+    private readonly ILogger logger;
+
     private string connectionString;
-    public SqlPersistentStorageProvider(string connectionString)
+    public SqlPersistentStorageProvider(IOptions<DatabaseOptions> options, ILoggerFactory loggerFactory)
     {
-      this.connectionString = connectionString;
+      this.connectionString = options.Value.ConnectionString;
+      this.logger = loggerFactory.CreateLogger("SqlPersistentStorageProvider");
     }
+
     public bool AddCodeSession(CodeSession codeSession)
     {
       string insertNewCodeSession = "INSERT INTO CodeSessions (Id, DateCreated, Code, CodeSyntax, CodeHighlights, Owner, UserInControl, Participants)" +
@@ -48,8 +54,9 @@ namespace codescreenme.Data.Processing.Sql
           command.ExecuteNonQuery();
           return true;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+          this.logger.LogError(e, "Sql error on adding code session {Id} for user {Owner}", codeSession.Id, codeSession.Owner);
           return false;
         }
       }
@@ -92,8 +99,9 @@ namespace codescreenme.Data.Processing.Sql
 
           return null;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+          this.logger.LogError(e, "Sql error on getting code session {Id}", id);
           return null;
         }
       }
@@ -137,8 +145,9 @@ namespace codescreenme.Data.Processing.Sql
 
           return result;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+          this.logger.LogError(e, "Sql error on getting code sessions");
           return Enumerable.Empty<CodeSession>();
         }
       }
@@ -162,8 +171,9 @@ namespace codescreenme.Data.Processing.Sql
           connection.Open();
           return (command.ExecuteNonQuery() > 0);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+          this.logger.LogError(e, "Sql error on deleting code session {Id}", id);
           return false;
         }
       }
@@ -206,8 +216,9 @@ namespace codescreenme.Data.Processing.Sql
           connection.Open();
           return (command.ExecuteNonQuery() > 0);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+          this.logger.LogError(e, "Sql error on updating code session {Id}", id);
           return false;
         }
       }

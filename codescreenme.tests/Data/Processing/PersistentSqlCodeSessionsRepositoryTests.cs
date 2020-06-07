@@ -1,5 +1,6 @@
 ﻿using codescreenme.Data;
 using codescreenme.Data.Processing;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -12,13 +13,15 @@ namespace codescreenme.tests.Data.Processing
   class PersistentSqlCodeSessionsRepositoryTests : CodeSessionsRepositoryTests
   {
     private Mock<IPersistentStorageProvider> mockProvider;
+    private Mock<ILoggerFactory> mockLogger;
 
     internal override void SetCodeRepo()
     {
       if (this.codeSessionsRepository == null)
       {
         this.mockProvider = new Mock<IPersistentStorageProvider>();
-        this.codeSessionsRepository = new PersistentCodeSessionsRepository(mockProvider.Object);
+        this.mockLogger = new Mock<ILoggerFactory>();
+        this.codeSessionsRepository = new PersistentCodeSessionsRepository(mockProvider.Object, mockLogger.Object);
       }
     }
 
