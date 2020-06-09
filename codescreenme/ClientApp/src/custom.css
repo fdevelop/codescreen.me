@@ -110,6 +110,14 @@ main.masthead {
     flex-direction: column;
     flex-grow: 1;
 }
+
 .CodeMirror {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
+
+.CodeMirror-scroll {
+    flex-grow: 1;
+}
+
