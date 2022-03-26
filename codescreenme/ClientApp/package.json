@@ -9,7 +9,7 @@
     "jquery": "^3.5.0",
     "codemirror": "^5.52.2",
     "merge": "^1.2.1",
-    "minimist": ">=1.2.3",
+    "minimist": ">=1.2.6",
     "nan": "^2.14.1",
     "oidc-client": "^1.9.0",
     "react": "^16.0.0",
@@ -32,7 +32,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.11.1",
     "typescript": "^3.5.2",
-    "minimist": ">=1.2.3"
+    "minimist": ">=1.2.6"
   },
   "eslintConfig": {
     "extends": "react-app"
